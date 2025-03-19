@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "235173116700",
+    "project_id": "senerity",
+    "storage_bucket": "senerity.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235173116700:android:9f7b19763d204cbf9518d9",
+        "android_client_info": {
+          "package_name": "com.example.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "235173116700-l2be4m7dbo2bpgi1uindf6656ep683e0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVMIJejc5rR2lWKvWIYuRgdP6AN4ibBLE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "235173116700-l2be4m7dbo2bpgi1uindf6656ep683e0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "235173116700-hu98jf53p8opc69bled2loa5ncbvb3sv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.adminshop"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
