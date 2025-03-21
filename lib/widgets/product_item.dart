@@ -63,6 +63,7 @@ class ProductItem extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.normal,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
                   const SizedBox(height: 5),

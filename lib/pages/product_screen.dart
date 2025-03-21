@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:admin/model/product_model.dart';
 import 'package:admin/services/image_service.dart';
 import 'package:admin/services/product_service.dart';
-import 'package:admin/widgets/product_item.dart';
 import 'package:flutter/material.dart';
 
 class ProductScreen extends StatefulWidget {
@@ -25,6 +24,7 @@ class _ProductScreenState extends State<ProductScreen> {
   File? selectedImage;
 
   void showProductDialog(BuildContext context, {ProductModel? product}) {
+    nameController.text = product?.productName ?? '';
     categoryController.text = product?.productCategory ?? '';
     priceController.text = product?.productPrice.toString() ?? '';
     selectedImage = null;
@@ -36,49 +36,60 @@ class _ProductScreenState extends State<ProductScreen> {
           builder: (context, setDialogState) {
             return AlertDialog(
               title: Text(product == null ? "Add Product" : "Edit Product"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: "Product Name: ",
-                    ),
-                  ),
-                  TextField(
-                    controller: categoryController,
-                    decoration: const InputDecoration(labelText: "Category"),
-                  ),
-                  TextField(
-                    controller: priceController,
-                    decoration: const InputDecoration(labelText: "Price"),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      File? image = await _imageService.pickImage();
-                      if (image != null) {
-                        setDialogState(() {
-                          selectedImage = image;
-                        });
-                      }
-                    },
-                    child: const Text("Pick Image"),
-                  ),
-                  if (selectedImage != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Text(
-                        "Selected File: ${selectedImage!.path.split('/').last}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: "Product Name",
+                        border: OutlineInputBorder(),
                       ),
                     ),
-                ],
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: categoryController,
+                      decoration: const InputDecoration(
+                        labelText: "Category",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: priceController,
+                      decoration: const InputDecoration(
+                        labelText: "Price",
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        File? image = await _imageService.pickImage();
+                        if (image != null) {
+                          setDialogState(() {
+                            selectedImage = image;
+                          });
+                        }
+                      },
+                      child: const Text("Pick Image"),
+                    ),
+                    if (selectedImage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          "Selected File: ${selectedImage!.path.split('/').last}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               actions: [
                 ElevatedButton(
@@ -94,8 +105,8 @@ class _ProductScreenState extends State<ProductScreen> {
                     }
 
                     final newProduct = ProductModel(
-                      productName: nameController.text,
                       productId: product?.productId ?? '',
+                      productName: nameController.text,
                       productCategory: categoryController.text,
                       productPrice:
                           double.tryParse(priceController.text) ?? 0.0,
@@ -122,64 +133,109 @@ class _ProductScreenState extends State<ProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey,
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          margin: const EdgeInsets.only(top: 30),
-          child: Column(
-            children: [
-              Text(
-                'Logged in as: ${widget.userEmail}',
-                style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
+      appBar: AppBar(
+        title: const Text("Product Management"),
+        backgroundColor: Colors.blue,
+      ),
+      backgroundColor: Colors.grey[200],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              'Logged in as: ${widget.userEmail}',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
               ),
-              SizedBox(height: 20),
-              const Text(
-                'List Of Product',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'List of Products',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: StreamBuilder<List<ProductModel>>(
-                  stream: productService.getProducts(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: StreamBuilder<List<ProductModel>>(
+                stream: productService.getProducts(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    final products = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        final product = products[index];
-                        return ProductItem(
-                          product: product,
-                          onEdit:
-                              () =>
-                                  showProductDialog(context, product: product),
-                          onDelete:
-                              () => productService.deleteProduct(
-                                product.productId,
+                  final products = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 3,
+                        child: ListTile(
+                          leading:
+                              product.productImageUrl != null
+                                  ? Image.network(
+                                    product.productImageUrl!,
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                  )
+                                  : const Icon(Icons.image, size: 50),
+                          title: Text(
+                            product.productName,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "Category: ${product.productCategory}\nPrice: \$${product.productPrice.toStringAsFixed(2)}",
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                ),
+                                onPressed:
+                                    () => showProductDialog(
+                                      context,
+                                      product: product,
+                                    ),
                               ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed:
+                                    () => productService.deleteProduct(
+                                      product.productId,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
