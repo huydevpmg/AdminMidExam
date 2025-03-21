@@ -7,7 +7,9 @@ import 'package:admin/widgets/product_item.dart';
 import 'package:flutter/material.dart';
 
 class ProductScreen extends StatefulWidget {
-  const ProductScreen({super.key});
+  final String? userEmail;
+
+  const ProductScreen({super.key, this.userEmail});
 
   @override
   State<ProductScreen> createState() => _ProductScreenState();
@@ -16,6 +18,8 @@ class ProductScreen extends StatefulWidget {
 class _ProductScreenState extends State<ProductScreen> {
   final ProductService productService = ProductService();
   final ImageService _imageService = ImageService();
+
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController categoryController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   File? selectedImage;
@@ -35,6 +39,12 @@ class _ProductScreenState extends State<ProductScreen> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: "Product Name: ",
+                    ),
+                  ),
                   TextField(
                     controller: categoryController,
                     decoration: const InputDecoration(labelText: "Category"),
@@ -84,6 +94,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     }
 
                     final newProduct = ProductModel(
+                      productName: nameController.text,
                       productId: product?.productId ?? '',
                       productCategory: categoryController.text,
                       productPrice:
@@ -118,6 +129,15 @@ class _ProductScreenState extends State<ProductScreen> {
           margin: const EdgeInsets.only(top: 30),
           child: Column(
             children: [
+              Text(
+                'Logged in as: ${widget.userEmail}',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+              SizedBox(height: 20),
               const Text(
                 'List Of Product',
                 style: TextStyle(

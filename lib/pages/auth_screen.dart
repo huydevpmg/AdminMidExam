@@ -87,11 +87,10 @@ class _LoginScreenState extends State<LoginScreen> {
     MaterialPageRoute(builder: (context) => SignupScreen()),
   );
 
-  goToHome(BuildContext context) => Navigator.push(
+  goToHome(BuildContext context, String? email) => Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => ProductScreen()),
+    MaterialPageRoute(builder: (context) => ProductScreen(userEmail: email)),
   );
-
   _login() async {
     final user = await _auth.loginUserWithEmailAndPassword(
       _email.text,
@@ -100,14 +99,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       log("User Logged In");
-      goToHome(context);
+      goToHome(context, user.email);
     }
   }
 
   _loginWithGoogle() async {
     UserCredential userCredential = await _auth.signInWithGoogle();
+    final email = userCredential.user?.email;
+
     print("Logged in as: ${userCredential.user?.email}");
     log("User Logged In");
-    goToHome(context);
+    goToHome(context, email);
   }
 }
