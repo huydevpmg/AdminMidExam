@@ -21,7 +21,11 @@ class _ProductScreenState extends State<ProductScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController categoryController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
+  final TextEditingController searchController =
+      TextEditingController(); // Controller for search bar
+
   File? selectedImage;
+  String searchQuery = ""; // Holds the current search query
 
   void showProductDialog(BuildContext context, {ProductModel? product}) {
     nameController.text = product?.productName ?? '';
@@ -151,13 +155,20 @@ class _ProductScreenState extends State<ProductScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'List of Products',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                labelText: "Search by Name or Category",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value.toLowerCase(); // Update search query
+                });
+              },
             ),
             const SizedBox(height: 20),
             Expanded(
@@ -171,7 +182,28 @@ class _ProductScreenState extends State<ProductScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final products = snapshot.data!;
+                  final products =
+                      snapshot.data!
+                          .where(
+                            (product) =>
+                                product.productName.toLowerCase().contains(
+                                  searchQuery,
+                                ) ||
+                                product.productCategory.toLowerCase().contains(
+                                  searchQuery,
+                                ),
+                          )
+                          .toList();
+
+                  if (products.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No products found",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    );
+                  }
+
                   return ListView.builder(
                     itemCount: products.length,
                     itemBuilder: (context, index) {

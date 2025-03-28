@@ -102,7 +102,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
     if (user != null) {
       log("User Created Succesfully");
-      goToHome(context);
+      goToLogin(context);
     }
   }
 }
